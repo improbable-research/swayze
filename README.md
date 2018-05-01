@@ -6,10 +6,10 @@
 /____/|__/|__/\__,_/\__, / /___/\___/ 
                    /____/             
 ```
+## Support
 
-## Branch Overview
-
-This branch is focussed on an implementation of the shallow water equations.
+This is an unsupported repo to build tests and demos of modelling tools on top
+of Keanu, in the open. 
 
 ## Overview
 
