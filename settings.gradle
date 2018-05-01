@@ -1,0 +1,6 @@
+rootProject.name = 'swayze'
+include 'finiteDifference'
+include 'swayze-examples'
+include 'finiteDifference-examples'
+include 'gnuPlotLib'
+
