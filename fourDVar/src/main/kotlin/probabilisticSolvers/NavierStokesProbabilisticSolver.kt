@@ -6,7 +6,6 @@ import gnuPlotLib.PlotField
 import io.improbable.keanu.kotlin.DoubleOperators
 import io.improbable.keanu.randomFactory.RandomFactory
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
-import io.improbable.swayze.examples.navierStokes.FieldParams
 
 class NavierStokesProbabilisticSolver<DOUBLE: DoubleOperators<DOUBLE>> (uInitial: Field<DOUBLE>, vInitial: Field<DOUBLE>, pInitial: Field<DOUBLE>,
                                                                         var params: FieldParams, var random: RandomFactory<DOUBLE>): IModel<DOUBLE> {
