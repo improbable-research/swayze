@@ -25,15 +25,20 @@ class ConservativeDroplet (domainSize: Double, noElements: Int) {
     var currentTime = 0.0
     var endTime = 30.0
 
-    var domain = Domain<ArithmeticDouble>(dx, dy,
-            Boundary.Periodic(),
-            Boundary.Periodic(),
-            Boundary.Periodic(),
-            Boundary.Periodic())
+    var velocityDomain = Domain(dx, dy,
+            Boundary.Dirichlet(ArithmeticDouble(0.0)),
+            Boundary.Dirichlet(ArithmeticDouble(0.0)),
+            Boundary.Dirichlet(ArithmeticDouble(0.0)),
+            Boundary.Dirichlet(ArithmeticDouble(0.0)))
+    var freeSurfaceDomain = Domain(dx,dy,
+            Boundary.Neumann(ArithmeticDouble(0.0)),
+            Boundary.Neumann(ArithmeticDouble(0.0)),
+            Boundary.Neumann(ArithmeticDouble(0.0)),
+            Boundary.Neumann(ArithmeticDouble(0.0)))
 
-    var u = Field(XSIZE, YSIZE, domain, { _, _ -> ArithmeticDouble(0.0) })
-    var v = Field(XSIZE, YSIZE, domain, { _, _ -> ArithmeticDouble(0.0) })
-    var eta = Field(XSIZE, YSIZE, domain, { i, j ->
+    var u = Field(XSIZE, YSIZE, velocityDomain, { _, _ -> ArithmeticDouble(0.0) })
+    var v = Field(XSIZE, YSIZE, velocityDomain, { _, _ -> ArithmeticDouble(0.0) })
+    var eta = Field(XSIZE, YSIZE, freeSurfaceDomain, { i, j ->
         if ((i*dx - xDroplet).pow(2) + (j*dy - yDroplet).pow(2) < radiusDroplet) {
             ArithmeticDouble(1.1)
         } else {
@@ -50,9 +55,18 @@ class ConservativeDroplet (domainSize: Double, noElements: Int) {
     }
 
     fun timestep() {
-        var deta_dt = -d_dx(u * (eta + H)) - d_dy(v * (eta + H))
-        var du_dt = (deta_dt * u - d_dx(eta * u.pow(2.0) + eta.pow(2.0) * g * 0.5) - d_dy(eta * u * v)) / eta
-        var dv_dt = (deta_dt * v - d_dy(eta * v.pow(2.0) + eta.pow(2.0) * g * 0.5) - d_dx(eta * u * v)) / eta
+        var deta_dt = -d_dx(u * (eta)) - d_dy(v * (eta))
+        var du_dt = (deta_dt * u
+                     - d_dx(eta * u * u)
+                     - d_dx(eta * eta * g * 0.5)
+                     - d_dy(eta * u * v)
+                     ) / eta
+
+        var dv_dt = (deta_dt * v
+                     - d_dy(eta * v * v)
+                     - d_dy(eta * eta * g * 0.5)
+                     - d_dx(eta * u * v)
+                     ) / eta
 
         eta = Field(eta + deta_dt * dt)
         u = Field(u + du_dt * dt)
@@ -65,7 +79,7 @@ fun main(args: Array<String>) {
     var domainSize = 0.25
     var noElements = (domainSize * 100).toInt()
 
-    var solver = NonConservativeDroplet(domainSize, noElements)
+    var solver = ConservativeDroplet(domainSize, noElements)
 
     solver.solve()
 }
