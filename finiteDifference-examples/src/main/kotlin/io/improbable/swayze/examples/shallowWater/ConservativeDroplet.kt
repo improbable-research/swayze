@@ -51,13 +51,8 @@ class ConservativeDroplet (domainSize: Double, noElements: Int) {
 
     fun timestep() {
         var deta_dt = -d_dx(u * (eta + H)) - d_dy(v * (eta + H))
-        var du_dt = -d_dx(eta) * g
-        var dv_dt = -d_dy(eta) * g
-
-
-//        7     deta_dt = -d_dx(eta*u) -d_dy(eta*v)
-//        6     du_dt = (deta_dt*u - d_dx(eta*u**2 + 1./2*g*eta**2) - d_dy(eta*u*v)) / eta
-//        5     dv_dt = (deta_dt*v - d_dx(eta*u*v) - d_dy(eta*v**2 + 1./2*g*eta**2)) / eta
+        var du_dt = (deta_dt * u - d_dx(eta * u.pow(2.0) + eta.pow(2.0) * g * 0.5) - d_dy(eta * u * v)) / eta
+        var dv_dt = (deta_dt * v - d_dy(eta * v.pow(2.0) + eta.pow(2.0) * g * 0.5) - d_dx(eta * u * v)) / eta
 
         eta = Field(eta + deta_dt * dt)
         u = Field(u + du_dt * dt)
