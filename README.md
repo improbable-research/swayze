@@ -9,7 +9,7 @@
 
 ## Branch Overview
 
-This branch is focussed on an implementation of the shallow water equations.
+This branch is focussed on an implementation of 4DVar and associated tests.
 
 ## Overview
 
