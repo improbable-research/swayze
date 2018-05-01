@@ -25,7 +25,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile group: "io.improbable", name: "keanu", version: "0.0.4"
     compile project(":finiteDifference")
-    compile project(":examples")
+    compile project(":finiteDifference-examples")
     compile project(":gnuPlotLib")
     compile project(":fourDVar")
     testCompile group: 'junit', name: 'junit', version: '4.12'
