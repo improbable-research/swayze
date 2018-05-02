@@ -5,9 +5,12 @@ import io.improbable.keanu.network.BayesNet
 import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 
-class DynamicBayesNet(probabilisticModel: IModel<DoubleVertex>) {
+class DynamicBayesNet<T : DoubleVertex>(probabilisticModel: IModel<DoubleVertex>, var startState: List<T>) {
 
-    var startState = probabilisticModel.getGaussianState()
+    init {
+        probabilisticModel.setState(startState)
+    }
+
     var observationVertices = probabilisticModel.runWindow()
     var endState = probabilisticModel.getState()
     var net = BayesNet(startState.iterator().next().connectedGraph)

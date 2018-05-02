@@ -2,12 +2,19 @@ package lorenz
 
 import fourDVar.IModel
 import io.improbable.keanu.kotlin.DoubleOperators
-import io.improbable.keanu.randomFactory.RandomFactory
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
+import temporary.RandomFactory
 import java.util.ArrayList
 
-class LorenzModel<DOUBLE: DoubleOperators<DOUBLE>>(var x: DOUBLE, var y: DOUBLE, var z: DOUBLE,
+class LorenzModel<DOUBLE: DoubleOperators<DOUBLE>>(val startState: Collection<DOUBLE>,
                                                    val random: RandomFactory<DOUBLE>) : IModel<DOUBLE> {
+
+    lateinit var x: DOUBLE
+    lateinit var y: DOUBLE
+    lateinit var z: DOUBLE
+
+    init {
+        setState(startState)
+    }
 
     val SIGMA = 10.0
     val BETA = 2.66667
@@ -19,15 +26,12 @@ class LorenzModel<DOUBLE: DoubleOperators<DOUBLE>>(var x: DOUBLE, var y: DOUBLE,
 
     override fun runWindow(): Collection<DOUBLE> {
         val observations = ArrayList<DOUBLE>(MICROSTEPS_PER_STEP)
-
         for (i in 0 until MICROSTEPS_PER_STEP) {
             step()
             observations.add(observe())
         }
-
         return observations
     }
-
 
     override fun step() {
         val dx = ((y - x) * SIGMA) * DT
@@ -38,20 +42,13 @@ class LorenzModel<DOUBLE: DoubleOperators<DOUBLE>>(var x: DOUBLE, var y: DOUBLE,
         z += dz
     }
 
-
     private fun observe(): DOUBLE {
         return random.nextGaussian(x, OBSERVATION_ERROR)
     }
 
-
     override fun getState(): Collection<DOUBLE> {
         return listOf(x, y, z)
     }
-
-    override fun getGaussianState(): Collection<GaussianVertex> {
-        return getState() as Collection<GaussianVertex>
-    }
-
 
     override fun setState(state: Collection<DOUBLE>) {
         val it = state.iterator()

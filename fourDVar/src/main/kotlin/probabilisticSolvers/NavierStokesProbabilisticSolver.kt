@@ -106,10 +106,6 @@ class NavierStokesProbabilisticSolver<DOUBLE: DoubleOperators<DOUBLE>> (uInitial
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getGaussianState(): MutableCollection<GaussianVertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun setState(state: Collection<DOUBLE>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

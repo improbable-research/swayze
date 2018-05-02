@@ -7,9 +7,18 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-open class SpectralToPhysicalConverter<T : DoubleOperators<T>>(var x: T, var y: T, var z: T) {
+open class SpectralToPhysicalConverter<T : DoubleOperators<T>>(startState: Collection<T>) {
 
-    constructor(it: Iterator<T>): this(it.next(), it.next(), it.next())
+    var x: T
+    var y: T
+    var z: T
+
+    init {
+        var it = startState.iterator()
+        x = it.next()
+        y = it.next()
+        z = it.next()
+    }
 
     fun getPsi(xsize : Int, ysize : Int) : Array2D<T> {
         val DX = 2.0 / (xsize * 0.707106781)
@@ -21,7 +30,6 @@ open class SpectralToPhysicalConverter<T : DoubleOperators<T>>(var x: T, var y: 
         })
         return psi
     }
-
 
     fun getVelocity(xsize : Int, ysize : Int) : Array2D<Pair<T, T>> {
         val DX = 2.0 / (xsize * 0.707106781)
@@ -37,7 +45,6 @@ open class SpectralToPhysicalConverter<T : DoubleOperators<T>>(var x: T, var y: 
         return v
     }
 
-
     fun getTheta(xsize : Int, ysize : Int) : Array2D<T> {
         val DX = 2.0 / (xsize * 0.707106781)
         val DY = 1.0 / (ysize + 1.0)
@@ -51,17 +58,14 @@ open class SpectralToPhysicalConverter<T : DoubleOperators<T>>(var x: T, var y: 
         return theta
     }
 
-
     fun getDeltaT(xPos : Double, yPos : Double) : T {
         return z * sin(2.0 * PI * yPos) / sqrt(2.0) -
                y * cos(2.0 * PI * xPos) * sin(PI * yPos)
     }
 
-
     override fun toString(): String {
         return "$x $y $z"
     }
-
 
     companion object {
         val SIGMA = 10.0
@@ -79,5 +83,4 @@ open class SpectralToPhysicalConverter<T : DoubleOperators<T>>(var x: T, var y: 
         val GA = R * NU * KAPPA * C
         val A = 0.707106781
     }
-
 }

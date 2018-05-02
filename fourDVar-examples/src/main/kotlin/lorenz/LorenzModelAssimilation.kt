@@ -1,11 +1,12 @@
 package Lorenz4DVar
 
-import fourDVar.FourDVar
 import fourDVar.DynamicBayesNet
+import fourDVar.GaussianFourDVar
 import io.improbable.keanu.kotlin.ArithmeticDouble
-import io.improbable.keanu.randomFactory.DoubleVertexFactory
-import io.improbable.keanu.randomFactory.RandomDoubleFactory
+import temporary.RandomDoubleFactory
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import lorenz.LorenzModel
+import temporary.DoubleVertexFactory
 
 class LorenzModelAssimilation() {
 
@@ -25,22 +26,23 @@ class LorenzModelAssimilation() {
 
         val random = RandomDoubleFactory()
 
-        val realWorld = LorenzModel(
+        val realStartState = listOf(
                 ArithmeticDouble(startX),
                 ArithmeticDouble(startY),
-                ArithmeticDouble(startZ),
-                random)
+                ArithmeticDouble(startZ))
+
+        val realWorld = LorenzModel(realStartState, random)
 
         val probabilistic = DoubleVertexFactory()
 
-        val probabilisticModel = LorenzModel(
+        val probabilisticStartState = listOf(
                 probabilistic.nextGaussian(startX + 0.01, initialObservationError),
                 probabilistic.nextGaussian(startY + 0.01, initialObservationError),
-                probabilistic.nextGaussian(startZ + 0.01, initialObservationError),
-                probabilistic)
+                probabilistic.nextGaussian(startZ + 0.01, initialObservationError))
 
-        val dynamicBayesNet = DynamicBayesNet(probabilisticModel)
-        val variationalBayes = FourDVar()
+        val probabilisticModel = LorenzModel(probabilisticStartState, probabilistic)
+        val dynamicBayesNet = DynamicBayesNet<GaussianVertex>(probabilisticModel, probabilisticStartState)
+        val variationalBayes = GaussianFourDVar()
 
         for (windowNumber in 0 until NUMBER_OF_WINDOWS) {
             val observations = realWorld.runWindow()

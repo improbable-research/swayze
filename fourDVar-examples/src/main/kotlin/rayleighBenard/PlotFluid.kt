@@ -55,10 +55,10 @@ class PlotFluid : GnuplotController {
 
     fun getMeanState(model: SpectralConvection<DoubleVertex>): SpectralToPhysicalConverter<ArithmeticDouble> {
         val it = model.getState().iterator()
-        return SpectralToPhysicalConverter(
+        return SpectralToPhysicalConverter(listOf(
                 ArithmeticDouble(it.next().value),
                 ArithmeticDouble(it.next().value),
-                ArithmeticDouble(it.next().value))
+                ArithmeticDouble(it.next().value)))
     }
 
     fun toGNUplotMatrix(convectionProblem: SpectralToPhysicalConverter<ArithmeticDouble>, xsize: Int, ysize: Int): Array2DRowRealMatrix {

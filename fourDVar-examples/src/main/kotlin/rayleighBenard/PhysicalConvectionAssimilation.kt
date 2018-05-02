@@ -3,11 +3,11 @@ package rayleighBenard
 import io.improbable.swayze.finiteDifference.Boundary
 import io.improbable.swayze.finiteDifference.Domain
 import fourDVar.DynamicBayesNet
-import fourDVar.FourDVar
+import fourDVar.GaussianFourDVar
 import gnuPlotLib.PlotField
 import io.improbable.keanu.kotlin.ArithmeticDouble
-import io.improbable.keanu.randomFactory.DoubleVertexFactory
-import io.improbable.keanu.randomFactory.RandomDoubleFactory
+import temporary.DoubleVertexFactory
+import temporary.RandomDoubleFactory
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 
 fun main(args: Array<String>) {
@@ -25,13 +25,11 @@ fun main(args: Array<String>) {
             Boundary.Periodic())
 
     val random = RandomDoubleFactory()
-
-    val realWorld = PhysicalConvection(
+    var realStartState = listOf(
             ArithmeticDouble(20.0),
             ArithmeticDouble(19.0),
-            ArithmeticDouble(50.0),
-            domain,
-            random)
+            ArithmeticDouble(50.0))
+    val realWorld = PhysicalConvection(realStartState, domain, random)
 
     // TODO this n'est pas de all that handsome
     val probabilisticDomain = Domain(DX, DY,
@@ -41,15 +39,14 @@ fun main(args: Array<String>) {
             Boundary.Periodic())
 
     val probabilistic = DoubleVertexFactory()
-    val probabilisticModel = PhysicalConvection(
+    var probabilisticStartState = listOf(
             probabilistic.nextGaussian(20.5, 1.0),
             probabilistic.nextGaussian(19.0, 1.0),
-            probabilistic.nextGaussian(50.0, 1.0),
-            probabilisticDomain,
-            probabilistic)
+            probabilistic.nextGaussian(50.0, 1.0))
+    val probabilisticModel = PhysicalConvection(probabilisticStartState, probabilisticDomain, probabilistic)
 
-    val bayesNetOfModel = DynamicBayesNet(probabilisticModel)
-    val fourDVar = FourDVar()
+    val bayesNetOfModel = DynamicBayesNet<GaussianVertex>(probabilisticModel, probabilisticStartState)
+    val fourDVar = GaussianFourDVar()
 
 //    var plot = PlotField()
 
@@ -60,7 +57,7 @@ fun main(args: Array<String>) {
 
 //        plot.linePlot(plot.scalarToGNUplotMatrix(realWorld.psi))
 
-        println("" + realWorld.ita[20,20] + " " + probabilisticModel.ita[20,20])
+        println("" + realWorld.ita[2,2] + " " + probabilisticModel.ita[2,2])
         println("Running window: " + window)
     }
 

@@ -3,11 +3,10 @@ package rayleighBenard
 import io.improbable.swayze.finiteDifference.*
 import fourDVar.IModel
 import io.improbable.keanu.kotlin.DoubleOperators
-import io.improbable.keanu.randomFactory.RandomFactory
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
+import temporary.RandomFactory
 
 
-class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startLorenzX: DOUBLE, startLorenzY: DOUBLE, startLorenzZ: DOUBLE,
+class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collection<DOUBLE>,
                                                            val domain: Domain<DOUBLE>, val random: RandomFactory<DOUBLE>):
         IModel<DOUBLE> {
 
@@ -19,7 +18,7 @@ class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startLorenzX: DOUBLE,
     val DX = 2.0 / (XSIZE * 0.707106781)
     val DY = 1.0 / (YSIZE + 1.0)
 
-    var converter = SpectralToPhysicalConverter(startLorenzX, startLorenzY, startLorenzZ)
+    var converter = SpectralToPhysicalConverter(startState)
 
     val TIMESTEPS_PER_WINDOW = 5
     val STREAMFUNCTION_ITERATIONS = 40
@@ -111,11 +110,7 @@ class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startLorenzX: DOUBLE,
     }
 
     override fun getState(): Collection<DOUBLE> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getGaussianState(): Collection<GaussianVertex> {
-        return getState() as Collection<GaussianVertex>
+        return psi.data.union(theta.data)
     }
 
     override fun setState(state: Collection<DOUBLE>) {

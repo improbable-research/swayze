@@ -6,30 +6,30 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import java.util.*
 
-class FourDVar {
+class GaussianFourDVar {
 
     private var MAX_MAP_EVALUATIONS = 2000
     private var POSTERIOR_SAMPLE_COUNT = 50
     private var BEST_FIT_SIGMA = 1.0
 
-    fun FourDVar() {}
+    fun GaussianFourDVar() {}
 
-    fun FourDVar(MAX_MAP_EVALUATIONS: Int) {
+    fun GaussianFourDVar(MAX_MAP_EVALUATIONS: Int) {
         this.MAX_MAP_EVALUATIONS = MAX_MAP_EVALUATIONS
     }
 
-    fun FourDVar(MAX_MAP_EVALUATIONS: Int, POSTERIOR_SAMPLE_COUNT: Int, BEST_FIT_SIGMA: Double) {
+    fun GaussianFourDVar(MAX_MAP_EVALUATIONS: Int, POSTERIOR_SAMPLE_COUNT: Int, BEST_FIT_SIGMA: Double) {
         this.MAX_MAP_EVALUATIONS = MAX_MAP_EVALUATIONS
         this.POSTERIOR_SAMPLE_COUNT = POSTERIOR_SAMPLE_COUNT
         this.BEST_FIT_SIGMA = BEST_FIT_SIGMA
     }
 
-    fun assimilate(dbNet: DynamicBayesNet) {
+    fun assimilate(dbNet: DynamicBayesNet<GaussianVertex>) {
         val bestFit = variationalBayes(dbNet)
         cycle(dbNet, bestFit)
     }
 
-    private fun variationalBayes(dbNet: DynamicBayesNet): HashMap<DoubleVertex, GaussianVertex> {
+    private fun variationalBayes(dbNet: DynamicBayesNet<GaussianVertex>): HashMap<DoubleVertex, GaussianVertex> {
         val graphOptimizer = GradientOptimizer(dbNet.net)
         graphOptimizer.maxAPosteriori(MAX_MAP_EVALUATIONS)
 
@@ -57,22 +57,19 @@ class FourDVar {
         return endStateBestFit
     }
 
-    private fun cycle(dbNet: DynamicBayesNet, bestFit: Map<DoubleVertex, GaussianVertex>) {
+    private fun cycle(dbNet: DynamicBayesNet<GaussianVertex>, bestFit: Map<DoubleVertex, GaussianVertex>) {
         val endVertexIt = dbNet.endState.iterator()
         for (startVertex in dbNet.startState) {
             if (!endVertexIt.hasNext()) throw(ArrayIndexOutOfBoundsException("start and end states don't have the same dimension, strange."))
-            val endVertex = endVertexIt.next()
 
-            if (startVertex is GaussianVertex) {
-                val bestFitVertex = bestFit.getValue(endVertex)
-                startVertex.mu.value = bestFitVertex.mu.value
-                startVertex.sigma.value = bestFitVertex.sigma.value
-            }
+            val endVertex = endVertexIt.next()
+            val bestFitVertex = bestFit.getValue(endVertex)
+
+            startVertex.mu.value = bestFitVertex.mu.value
+            startVertex.sigma.value = bestFitVertex.sigma.value
         }
         for (startVertex in dbNet.startState) {
-            if (startVertex is GaussianVertex) {
-                startVertex.setAndCascade(startVertex.mu.value)
-            }
+            startVertex.setAndCascade(startVertex.mu.value)
         }
     }
 }

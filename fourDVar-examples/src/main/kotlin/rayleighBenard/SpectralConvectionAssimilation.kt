@@ -1,31 +1,30 @@
 package rayleighBenard
 
 import fourDVar.DynamicBayesNet
-import fourDVar.FourDVar
+import fourDVar.GaussianFourDVar
 import io.improbable.keanu.kotlin.ArithmeticDouble
-import io.improbable.keanu.randomFactory.DoubleVertexFactory
-import io.improbable.keanu.randomFactory.RandomDoubleFactory
+import temporary.DoubleVertexFactory
+import temporary.RandomDoubleFactory
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 
 fun main(args: Array<String>) {
 
     val random = RandomDoubleFactory()
-    val realWorld = SpectralConvection(
+    var realStartState = listOf(
             ArithmeticDouble(20.0),
             ArithmeticDouble(19.0),
-            ArithmeticDouble(50.0),
-            random
-    )
+            ArithmeticDouble(50.0))
+    val realWorld = SpectralConvection(realStartState, random)
 
     val probabilistic = DoubleVertexFactory()
-    val probabilisticModel = SpectralConvection(
+    val probabilisticStartState = listOf(
             probabilistic.nextGaussian(20.5, 1.0),
             probabilistic.nextGaussian(19.5, 1.0),
-            probabilistic.nextGaussian(50.3, 1.0),
-            probabilistic
-    )
+            probabilistic.nextGaussian(50.3, 1.0))
+    var probabilisticModel = SpectralConvection(probabilisticStartState, probabilistic)
 
-    val bayesNetOfModel = DynamicBayesNet(probabilisticModel)
-    val assimilationAlgorithm = FourDVar()
+    val bayesNetOfModel = DynamicBayesNet<GaussianVertex>(probabilisticModel, probabilisticStartState)
+    val assimilationAlgorithm = GaussianFourDVar()
 
     val plot = PlotFluid()
 

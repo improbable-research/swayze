@@ -3,18 +3,21 @@ package rayleighBenard
 import fourDVar.IModel
 import io.improbable.keanu.kotlin.ArithmeticDouble
 import io.improbable.keanu.kotlin.DoubleOperators
-import io.improbable.keanu.randomFactory.RandomFactory
+import temporary.RandomFactory
 import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import java.util.ArrayList
 
-class SpectralConvection<DOUBLE : DoubleOperators<DOUBLE>>(X : DOUBLE, Y : DOUBLE, Z : DOUBLE,
+class SpectralConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collection<DOUBLE>,
                                                            val random: RandomFactory<DOUBLE>):
-        SpectralToPhysicalConverter<DOUBLE>(X,Y,Z), IModel<DOUBLE> {
+        SpectralToPhysicalConverter<DOUBLE>(startState), IModel<DOUBLE> {
+
+    init {
+        setState(startState)
+    }
 
     override fun runWindow(): Collection<DOUBLE> {
-        val observations = ArrayList<DOUBLE>(MICROSTEPS_PER_STEP)
-        for (i in 1..MICROSTEPS_PER_STEP) {
+        val observations = ArrayList<DOUBLE>(STEPS_PER_WINDOW)
+        for (i in 1..STEPS_PER_WINDOW) {
             step()
             observations.add(observe())
         }
@@ -40,11 +43,6 @@ class SpectralConvection<DOUBLE : DoubleOperators<DOUBLE>>(X : DOUBLE, Y : DOUBL
         return listOf(x, y, z)
     }
 
-    override fun getGaussianState(): Collection<GaussianVertex> {
-        return getState() as Collection<GaussianVertex>
-
-    }
-
     override fun setState(state: Collection<DOUBLE>) {
         val it = state.iterator()
         x = it.next()
@@ -53,11 +51,11 @@ class SpectralConvection<DOUBLE : DoubleOperators<DOUBLE>>(X : DOUBLE, Y : DOUBL
     }
 
     fun getMeanState(probabiliticState: Collection<DoubleVertex>): SpectralToPhysicalConverter<ArithmeticDouble> {
-        val it = probabiliticState.iterator()
-        return SpectralToPhysicalConverter(
+        var it = probabiliticState.iterator()
+        return SpectralToPhysicalConverter(listOf(
                 ArithmeticDouble(it.next().value),
                 ArithmeticDouble(it.next().value),
-                ArithmeticDouble(it.next().value))
+                ArithmeticDouble(it.next().value)))
     }
 
     fun getFluidState() : SpectralToPhysicalConverter<DOUBLE> {
@@ -65,6 +63,6 @@ class SpectralConvection<DOUBLE : DoubleOperators<DOUBLE>>(X : DOUBLE, Y : DOUBL
     }
 
     companion object {
-        val MICROSTEPS_PER_STEP = 5
+        val STEPS_PER_WINDOW = 5
     }
 }
