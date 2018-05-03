@@ -5,7 +5,7 @@ import io.improbable.keanu.kotlin.DoubleOperators
 import temporary.RandomFactory
 import java.util.ArrayList
 
-class LorenzModel<DOUBLE: DoubleOperators<DOUBLE>>(val startState: Collection<DOUBLE>,
+class LorenzModel<DOUBLE: DoubleOperators<DOUBLE>>(val startState: List<DOUBLE>,
                                                    val random: RandomFactory<DOUBLE>) : IModel<DOUBLE> {
 
     lateinit var x: DOUBLE
