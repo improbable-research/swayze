@@ -46,16 +46,21 @@ fun main(args: Array<String>) {
     val probabilisticModel = PhysicalConvection(probabilisticStartState, probabilisticDomain, probabilistic)
 
     val bayesNetOfModel = DynamicBayesNet<GaussianVertex>(probabilisticModel, probabilisticStartState)
-    val fourDVar = GaussianFourDVar()
+    println("Constructed initial Bayesian Network")
+    val fourDVar = GaussianFourDVar(4)
 
-//    var plot = PlotField()
+    var plot = PlotField()
 
     for (window in 0 until 200) {
+        println("\nRunning window...")
         val observations = realWorld.runWindow()
+        println("\nAdding observations...")
         bayesNetOfModel.addObservations((observations))
+        println("\nAssimilating...")
         fourDVar.assimilate(bayesNetOfModel)
+        println("\nAssimilation complete... Well done Dave")
 
-//        plot.linePlot(plot.scalarToGNUplotMatrix(realWorld.psi))
+        plot.linePlot(plot.scalarToGNUplotMatrix(realWorld.psi))
 
         println("" + realWorld.ita[2,2] + " " + probabilisticModel.ita[2,2])
         println("Running window: " + window)

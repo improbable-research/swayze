@@ -20,7 +20,7 @@ class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collectio
 
     var converter = SpectralToPhysicalConverter(startState)
 
-    val TIMESTEPS_PER_WINDOW = 5
+    val TIMESTEPS_PER_WINDOW = 2
     val STREAMFUNCTION_ITERATIONS = 40
     val RELAXATION = 0.4 // n.b. over-relaxation to speed convergence
 
@@ -78,7 +78,7 @@ class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collectio
         var DX2 = DX * DX
         var DY2 = DY * DY
         for (i in 0 until STREAMFUNCTION_ITERATIONS) {
-            println("streamfunction iteration " + i)
+//            println("streamfunction iteration " + i)
             psi = Field(((ShiftN(psi) + ShiftS(psi))/DY2 + (ShiftE(psi) + ShiftW(psi))/DX2 - ita)
                                * (RELAXATION / (2.0/DX2 + 2.0/DY2))
                                + psi * (1.0 - RELAXATION))
@@ -110,6 +110,7 @@ class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collectio
     }
 
     override fun getState(): Collection<DOUBLE> {
+        println("Getting state...")
         return psi.data.union(theta.data)
     }
 

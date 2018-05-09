@@ -6,23 +6,11 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import java.util.*
 
-class GaussianFourDVar {
+class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT: Int, var BEST_FIT_SIGMA: Double) {
 
-    private var MAX_MAP_EVALUATIONS = 2000
-    private var POSTERIOR_SAMPLE_COUNT = 50
-    private var BEST_FIT_SIGMA = 1.0
+    constructor() : this(2000, 50, 1.0)
 
-    fun GaussianFourDVar() {}
-
-    fun GaussianFourDVar(MAX_MAP_EVALUATIONS: Int) {
-        this.MAX_MAP_EVALUATIONS = MAX_MAP_EVALUATIONS
-    }
-
-    fun GaussianFourDVar(MAX_MAP_EVALUATIONS: Int, POSTERIOR_SAMPLE_COUNT: Int, BEST_FIT_SIGMA: Double) {
-        this.MAX_MAP_EVALUATIONS = MAX_MAP_EVALUATIONS
-        this.POSTERIOR_SAMPLE_COUNT = POSTERIOR_SAMPLE_COUNT
-        this.BEST_FIT_SIGMA = BEST_FIT_SIGMA
-    }
+    constructor(MAX_MAP_EVALUATIONS: Int) : this(MAX_MAP_EVALUATIONS, 50, 1.0)
 
     fun assimilate(dbNet: DynamicBayesNet<GaussianVertex>) {
         val bestFit = variationalBayes(dbNet)
@@ -30,8 +18,11 @@ class GaussianFourDVar {
     }
 
     private fun variationalBayes(dbNet: DynamicBayesNet<GaussianVertex>): HashMap<DoubleVertex, GaussianVertex> {
+        println("- Creating graph optimiser...")
         val graphOptimizer = GradientOptimizer(dbNet.net)
+        println("- Determining MAP with " + MAX_MAP_EVALUATIONS + " evaluations")
         graphOptimizer.maxAPosteriori(MAX_MAP_EVALUATIONS)
+        println("- Fully MAPed up...")
 
         val endStateBestFit = HashMap<DoubleVertex, GaussianVertex>()
         for (vertex in dbNet.endState) {
@@ -40,6 +31,7 @@ class GaussianFourDVar {
         val endStateList = arrayListOf<DoubleVertex>()
         dbNet.endState.forEach { dv -> endStateList.add(dv) }
 
+        println("- Performing Metropolis Hastings")
         val samples = MetropolisHastings.getPosteriorSamples(dbNet.net, endStateList, POSTERIOR_SAMPLE_COUNT)
 
         for (vertex in dbNet.endState) {
