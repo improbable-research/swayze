@@ -19,10 +19,12 @@ These modules simplify the implementation of models in common paradigms.
 ## Modules
 
 * Finite Difference in 2D
+* Four-D Var (Data Assimilation)
 
 ## Examples
 
 * Navier-Stokes for incompressible flow
+* Lorenz equations
 
 
 
