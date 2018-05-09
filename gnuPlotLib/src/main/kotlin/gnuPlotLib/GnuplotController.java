@@ -91,6 +91,12 @@ public class GnuplotController extends PipeExecutor {
         }
     }
 
+    public void linePlot(RealMatrix m, Double zMin, Double zMax) throws IOException {
+        writeln("set zrange [" + zMin + ":" + zMax + "]");
+        writeln("set cbrange [" + zMin + ":" + zMax + "]");
+        linePlot(m);
+    }
+
     public void linePlot(RealMatrix m) throws IOException {
         switch(m.getColumnDimension()) {
             case 2:
@@ -98,6 +104,7 @@ public class GnuplotController extends PipeExecutor {
                 writeDataFrame(m, false);
                 break;
             case 3:
+                writeln("set pm3d at b");
                 writeln("splot '-' with lines");
                 writeDataFrame(m, true);
                 break;

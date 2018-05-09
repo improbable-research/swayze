@@ -45,7 +45,7 @@ class NonConservativeDroplet (domainSize: Double, noElements: Int) {
             println("t = " + currentTime)
             timestep()
             currentTime += dt
-            plot.linePlot(plot.scalarToGNUplotMatrix(eta))
+            plot.linePlot(plot.scalarToGNUplotMatrix(eta), 0.95, 1.05)
         }
     }
 
