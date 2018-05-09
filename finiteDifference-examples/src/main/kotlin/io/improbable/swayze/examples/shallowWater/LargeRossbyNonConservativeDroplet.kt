@@ -5,7 +5,7 @@ import io.improbable.keanu.kotlin.ArithmeticDouble
 import io.improbable.swayze.finiteDifference.*
 import kotlin.math.pow
 
-class NonConservativeDroplet (domainSize: Double, noElements: Int) {
+class LargeRossbyNonConservativeDroplet (domainSize: Double, noElements: Int) {
 
     var XSIZE = noElements
     var YSIZE = noElements
@@ -19,6 +19,8 @@ class NonConservativeDroplet (domainSize: Double, noElements: Int) {
 
     var g = 1.0
     var H = 0.0
+    var b = 0.0 // viscous drag coefficient
+    var nu = 1000.0
 
     var plot = PlotField()
 
@@ -40,18 +42,29 @@ class NonConservativeDroplet (domainSize: Double, noElements: Int) {
             ArithmeticDouble(1.0)
         }})
 
+
     fun solve () {
         while (currentTime < endTime) {
             println("t = " + currentTime)
             timestep()
             currentTime += dt
-            plot.linePlot(plot.scalarToGNUplotMatrix(eta), 0.9, 1.0)
+            plot.linePlot(plot.scalarToGNUplotMatrix(eta))
         }
     }
 
     fun timestep() {
-        var du_dt = -d_dx(eta) * g
-        var dv_dt = -d_dy(eta) * g
+        var du_dt = (- d_dx(eta) * g
+                     - u * b
+                     - u * d_dx(u)
+                     - v * d_dy(u)
+//                     + (d2_dx2(u) + d2_dy2(u)) * nu
+                )
+        var dv_dt = (- d_dy(eta) * g
+                     - v * b
+                     - u * d_dx(v)
+                     - v * d_dy(v)
+//                     + (d2_dx2(v) + d2_dy2(v)) * nu
+                )
         var deta_dt = -d_dx(u * (eta + H)) - d_dy(v * (eta + H))
 
         eta = Field(eta + deta_dt * dt)
@@ -65,7 +78,7 @@ fun main(args: Array<String>) {
     var domainSize = 0.25
     var noElements = (domainSize * 100).toInt()
 
-    var solver = NonConservativeDroplet(domainSize, noElements)
+    var solver = LargeRossbyNonConservativeDroplet(domainSize, noElements)
 
     solver.solve()
 }
