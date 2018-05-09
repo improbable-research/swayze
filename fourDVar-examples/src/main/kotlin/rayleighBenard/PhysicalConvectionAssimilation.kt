@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
 
     val bayesNetOfModel = DynamicBayesNet<GaussianVertex>(probabilisticModel, probabilisticStartState)
     println("Constructed initial Bayesian Network")
-    val fourDVar = GaussianFourDVar(4)
+    val fourDVar = GaussianFourDVar(1)
 
     var plot = PlotField()
 
