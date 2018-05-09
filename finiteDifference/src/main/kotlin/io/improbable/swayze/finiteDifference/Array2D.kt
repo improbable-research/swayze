@@ -3,7 +3,7 @@ package io.improbable.swayze.finiteDifference
 open class Array2D<T>(iSize: Int, jSize: Int, vals: (Int, Int) -> T) : IArray2D<T> {
 
     private val stride = jSize
-    private var data = ArrayList<T>(iSize * jSize)
+    var data = ArrayList<T>(iSize * jSize)
 
     init {
         for (i in 0 until iSize) {

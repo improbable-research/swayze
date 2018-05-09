@@ -1,7 +1,5 @@
-package io.improbable.swayze.examples.navierStokes
+package io.improbable.swayze.finiteDifference
 
-import io.improbable.swayze.finiteDifference.Boundary
-import io.improbable.swayze.finiteDifference.Domain
 import io.improbable.keanu.kotlin.ArithmeticDouble
 
 class FieldParams(var XSIZE: Int, var YSIZE: Int, var DX: Double, var DY: Double) {

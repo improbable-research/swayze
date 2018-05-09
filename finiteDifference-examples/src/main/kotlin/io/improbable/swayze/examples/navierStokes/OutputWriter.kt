@@ -2,6 +2,7 @@ package io.improbable.swayze.examples.navierStokes
 
 import io.improbable.swayze.finiteDifference.Field
 import io.improbable.keanu.kotlin.ArithmeticDouble
+import io.improbable.swayze.finiteDifference.FieldParams
 import java.io.File
 
 class OutputWriter (val variableName: String, val params: FieldParams) {
