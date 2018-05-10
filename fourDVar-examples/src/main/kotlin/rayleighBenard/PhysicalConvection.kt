@@ -6,21 +6,21 @@ import io.improbable.keanu.kotlin.DoubleOperators
 import temporary.RandomFactory
 
 
-class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collection<DOUBLE>,
-                                                           val domain: Domain<DOUBLE>, val random: RandomFactory<DOUBLE>):
+class PhysicalConvection<DOUBLE : DoubleOperators<DOUBLE>>(startState: Collection<DOUBLE>, val domain: Domain<DOUBLE>,
+                                                           val params: FieldParams, val random: RandomFactory<DOUBLE>):
         IModel<DOUBLE> {
 
     var t = 0.0
-    var TLENGTH = 0.001
-    var DT = 0.00001
-    var XSIZE = 3
-    var YSIZE = 3
-    val DX = 2.0 / (XSIZE * 0.707106781)
-    val DY = 1.0 / (YSIZE + 1.0)
+    var TLENGTH = params.TLENGTH
+    var DT = params.DT
+    var DX = domain.DX
+    var DY = domain.DY
+    var XSIZE = params.XSIZE
+    var YSIZE = params.YSIZE
 
     var converter = SpectralToPhysicalConverter(startState)
 
-    val TIMESTEPS_PER_WINDOW = 2
+    val TIMESTEPS_PER_WINDOW = 5
     val STREAMFUNCTION_ITERATIONS = 40
     val RELAXATION = 0.4 // n.b. over-relaxation to speed convergence
 

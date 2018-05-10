@@ -2,6 +2,7 @@ package fourDVar
 
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings
 import io.improbable.keanu.algorithms.variational.GradientOptimizer
+import io.improbable.keanu.vertices.Vertex
 import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import java.util.*
@@ -18,11 +19,9 @@ class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT:
     }
 
     private fun variationalBayes(dbNet: DynamicBayesNet<GaussianVertex>): HashMap<DoubleVertex, GaussianVertex> {
-        println("- Creating graph optimiser...")
         val graphOptimizer = GradientOptimizer(dbNet.net)
-        println("- Determining MAP with " + MAX_MAP_EVALUATIONS + " evaluations")
+        println("MAPping...")
         graphOptimizer.maxAPosteriori(MAX_MAP_EVALUATIONS)
-        println("- Fully MAPed up...")
 
         val endStateBestFit = HashMap<DoubleVertex, GaussianVertex>()
         for (vertex in dbNet.endState) {
@@ -31,8 +30,8 @@ class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT:
         val endStateList = arrayListOf<DoubleVertex>()
         dbNet.endState.forEach { dv -> endStateList.add(dv) }
 
-        println("- Performing Metropolis Hastings")
-        val samples = MetropolisHastings.getPosteriorSamples(dbNet.net, endStateList, POSTERIOR_SAMPLE_COUNT)
+        println("Metropolis Hastinging...")
+        val samples = MetropolisHastings.getPosteriorSamples(dbNet.net, endStateList as List<Vertex<Any>>?, POSTERIOR_SAMPLE_COUNT)
 
         for (vertex in dbNet.endState) {
             var xbar = 0.0

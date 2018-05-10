@@ -2,6 +2,7 @@ package gnuPlotLib
 
 import io.improbable.swayze.finiteDifference.*
 import io.improbable.keanu.kotlin.ArithmeticDouble
+import io.improbable.keanu.vertices.dbl.DoubleVertex
 import org.apache.commons.math3.linear.Array2DRowRealMatrix
 import java.awt.Toolkit
 
@@ -87,6 +88,38 @@ class PlotField : GnuplotController {
         var xsize = f.iSize()
         var ysize = f.jSize()
         return scalarToGNUplotMatrix(f, xsize, ysize)
+    }
+
+    fun scalarToGNUplotMatrix(f1: Field<ArithmeticDouble>, f2: Field<DoubleVertex>): Array2DRowRealMatrix {
+        val xsize = f1.iSize()
+        val ysize = f1.jSize()
+        val matrix = Array2DRowRealMatrix(2 * xsize * ysize + 10 * ysize, 3)
+        var m_j = 0
+        for (i in 0 until xsize) {
+            for (j in 0 until ysize) {
+                matrix.setEntry(m_j, 0, 1.0 * i)
+                matrix.setEntry(m_j, 1, 1.0 * j)
+                matrix.setEntry(m_j, 2, f1[i, j].value)
+                m_j += 1
+            }
+        }
+        for (i in xsize until xsize+10) {
+            for (j in 0 until ysize) {
+                matrix.setEntry(m_j, 0, 1.0*i)
+                matrix.setEntry(m_j, 1, 1.0*j)
+                matrix.setEntry(m_j, 2, -1.0)
+                m_j += 1
+            }
+        }
+        for (i in 0 until xsize) {
+            for (j in 0 until ysize) {
+                matrix.setEntry(m_j, 0, 1.0*i + xsize + 10)
+                matrix.setEntry(m_j, 1, 1.0*j)
+                matrix.setEntry(m_j, 2, f2[i, j].value)
+                m_j += 1
+            }
+        }
+        return matrix
     }
 
     fun scalarToGNUplotMatrix(f1: Field<ArithmeticDouble>, f2: Field<ArithmeticDouble>, xsize: Int, ysize: Int): Array2DRowRealMatrix {

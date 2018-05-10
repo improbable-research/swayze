@@ -98,6 +98,7 @@ public class GnuplotController extends PipeExecutor {
                 writeDataFrame(m, false);
                 break;
             case 3:
+                writeln("set pm3d");
                 writeln("splot '-' with lines");
                 writeDataFrame(m, true);
                 break;

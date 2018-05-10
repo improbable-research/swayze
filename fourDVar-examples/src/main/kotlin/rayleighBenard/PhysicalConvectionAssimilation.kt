@@ -9,14 +9,16 @@ import io.improbable.keanu.kotlin.ArithmeticDouble
 import temporary.DoubleVertexFactory
 import temporary.RandomDoubleFactory
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
+import io.improbable.swayze.finiteDifference.FieldParams
 
 fun main(args: Array<String>) {
 
-    // TODO tidy these up into a container
-    var XSIZE = 10 //80
-    var YSIZE = 10 //28
+    val XSIZE = 80
+    val YSIZE = 28
     val DX = 2.0 / (XSIZE * 0.707106781)
     val DY = 1.0 / (YSIZE + 1.0)
+
+    var params = FieldParams(XSIZE, YSIZE,0.01, DX, DY, 0.00001)
 
     val domain = Domain(DX, DY,
             Boundary.Dirichlet(ArithmeticDouble(0.0)),
@@ -29,9 +31,8 @@ fun main(args: Array<String>) {
             ArithmeticDouble(20.0),
             ArithmeticDouble(19.0),
             ArithmeticDouble(50.0))
-    val realWorld = PhysicalConvection(realStartState, domain, random)
+    val realWorld = PhysicalConvection(realStartState, domain, params, random)
 
-    // TODO this n'est pas de all that handsome
     val probabilisticDomain = Domain(DX, DY,
             Boundary.Dirichlet(GaussianVertex(0.0, 1.0)),
             Boundary.Dirichlet(GaussianVertex(0.0, 1.0)),
@@ -43,26 +44,21 @@ fun main(args: Array<String>) {
             probabilistic.nextGaussian(20.5, 1.0),
             probabilistic.nextGaussian(19.0, 1.0),
             probabilistic.nextGaussian(50.0, 1.0))
-    val probabilisticModel = PhysicalConvection(probabilisticStartState, probabilisticDomain, probabilistic)
+    val probabilisticModel = PhysicalConvection(probabilisticStartState, probabilisticDomain, params, probabilistic)
 
     val bayesNetOfModel = DynamicBayesNet<GaussianVertex>(probabilisticModel, probabilisticStartState)
-    println("Constructed initial Bayesian Network")
-    val fourDVar = GaussianFourDVar(1)
+    val fourDVar = GaussianFourDVar()
 
     var plot = PlotField()
 
     for (window in 0 until 200) {
-        println("\nRunning window...")
         val observations = realWorld.runWindow()
-        println("\nAdding observations...")
         bayesNetOfModel.addObservations((observations))
-        println("\nAssimilating...")
         fourDVar.assimilate(bayesNetOfModel)
-        println("\nAssimilation complete... Well done Dave")
 
-        plot.linePlot(plot.scalarToGNUplotMatrix(realWorld.psi))
+        plot.linePlot(plot.scalarToGNUplotMatrix(realWorld.psi, probabilisticModel.psi))
 
-        println("" + realWorld.ita[2,2] + " " + probabilisticModel.ita[2,2])
+        println("- " + realWorld.ita[2,2].value + " " + probabilisticModel.ita[2,2].value)
         println("Running window: " + window)
     }
 
