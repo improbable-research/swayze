@@ -20,8 +20,10 @@ class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT:
 
     private fun variationalBayes(dbNet: DynamicBayesNet<GaussianVertex>): HashMap<DoubleVertex, GaussianVertex> {
         val graphOptimizer = GradientOptimizer(dbNet.net)
+        var start = System.currentTimeMillis()
         println("MAPping...")
         graphOptimizer.maxAPosteriori(MAX_MAP_EVALUATIONS)
+        println("- - - MAP took: " + (System.currentTimeMillis() - start))
 
         val endStateBestFit = HashMap<DoubleVertex, GaussianVertex>()
         for (vertex in dbNet.endState) {
@@ -30,8 +32,10 @@ class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT:
         val endStateList = arrayListOf<DoubleVertex>()
         dbNet.endState.forEach { dv -> endStateList.add(dv) }
 
+        start = System.currentTimeMillis()
         println("Metropolis Hastinging...")
         val samples = MetropolisHastings.getPosteriorSamples(dbNet.net, endStateList as List<Vertex<Any>>?, POSTERIOR_SAMPLE_COUNT)
+        println("- - - Met Hastings took: " + (System.currentTimeMillis() - start))
 
         for (vertex in dbNet.endState) {
             var xbar = 0.0

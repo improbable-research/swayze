@@ -13,8 +13,8 @@ import io.improbable.swayze.finiteDifference.FieldParams
 
 fun main(args: Array<String>) {
 
-    val XSIZE = 80
-    val YSIZE = 28
+    val XSIZE = 10 //80
+    val YSIZE = 10 //28
     val DX = 2.0 / (XSIZE * 0.707106781)
     val DY = 1.0 / (YSIZE + 1.0)
 
@@ -52,7 +52,10 @@ fun main(args: Array<String>) {
     var plot = PlotField()
 
     for (window in 0 until 200) {
+        val start = System.currentTimeMillis()
+        println("Running window")
         val observations = realWorld.runWindow()
+        println("- - - Window run time: " + (System.currentTimeMillis() - start))
         bayesNetOfModel.addObservations((observations))
         fourDVar.assimilate(bayesNetOfModel)
 
