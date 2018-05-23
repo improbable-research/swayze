@@ -7,13 +7,13 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import java.util.*
 
-class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT: Int, var BEST_FIT_SIGMA: Double) {
+class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT: Int, var BEST_FIT_SIGMA: Double): IAssimilator<GaussianVertex> {
 
     constructor() : this(2000, 50, 1.0)
 
     constructor(MAX_MAP_EVALUATIONS: Int) : this(MAX_MAP_EVALUATIONS, 50, 1.0)
 
-    fun assimilate(dbNet: DynamicBayesNet<GaussianVertex>) {
+    override fun assimilate(dbNet: DynamicBayesNet<GaussianVertex>) {
         val bestFit = variationalBayes(dbNet)
         cycle(dbNet, bestFit)
     }
@@ -52,7 +52,7 @@ class GaussianFourDVar(var MAX_MAP_EVALUATIONS: Int, var POSTERIOR_SAMPLE_COUNT:
         return endStateBestFit
     }
 
-    private fun cycle(dbNet: DynamicBayesNet<GaussianVertex>, bestFit: Map<DoubleVertex, GaussianVertex>) {
+    override fun cycle(dbNet: DynamicBayesNet<GaussianVertex>, bestFit: Map<DoubleVertex, GaussianVertex>) {
         val endVertexIt = dbNet.endState.iterator()
         for (startVertex in dbNet.startState) {
             if (!endVertexIt.hasNext()) throw(ArrayIndexOutOfBoundsException("start and end states don't have the same dimension, strange."))
